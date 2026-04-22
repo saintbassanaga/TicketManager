@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.name }} - TicketManager{% endblock %}
+
+{% block content %}
+    <div class="flex-between" style="margin-bottom: 20px;">
+        <a href="{% url 'frontend-event-list' %}" style="font-size: 0.9em;">&larr; Retour à la liste</a>
+        <div>
+            <a href="{% url 'frontend-event-edit' event.pk %}" class="btn" style="background: #f39c12; margin-right: 5px;">Modifier</a>
+            <a href="{% url 'frontend-event-delete' event.pk %}" class="btn" style="background: #e74c3c;">Supprimer</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h1>{{ event.name }}</h1>
+        <p style="color: #666;">
+            <strong>Quand :</strong> {{ event.date|date:"d F Y à H:i" }}<br>
+            <strong>Où :</strong> {{ event.location }}
+        </p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p>{{ event.description|linebreaks }}</p>
+    </div>
+
+    <div class="flex-between" style="margin-top: 30px; margin-bottom: 10px;">
+        <h2>Tickets Disponibles</h2>
+        <a href="{% url 'frontend-ticket-add' event.pk %}" class="btn" style="background: #27ae60; font-size: 12px;">+ Ajouter une catégorie</a>
+    </div>
+
+    <div class="card">
+        {% if tickets %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Prix</th>
+                        <th>Disponibilité</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                        <tr>
+                            <td><strong>{{ ticket.get_ticket_type_display }}</strong></td>
+                            <td>{{ ticket.price }} FCFA</td>
+                            <td>
+                                {% if ticket.quantity_available > 0 %}
+                                    {{ ticket.quantity_available }} places restantes
+                                {% else %}
+                                    <span style="color: red;">COMPLET</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ticket.quantity_available > 0 %}
+                                    <a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">Réserver</a>
+                                {% else %}
+                                    <button class="btn" disabled style="padding: 5px 10px; font-size: 12px; background: #ccc; cursor: not-allowed;">Indisponible</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Aucun ticket n'est disponible pour cet événement.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer {{ event.name }} - TicketManager{% endblock %}
+
+{% block content %}
+    <h1>Supprimer l'événement</h1>
+
+    <div class="card" style="border-top: 4px solid #721c24;">
+        <p>Êtes-vous sûr de vouloir supprimer l'événement <strong>"{{ event.name }}"</strong> ?</p>
+        <p style="color: #666; font-size: 0.9em;">Cette action est irréversible et supprimera également tous les tickets associés.</p>
+
+        <form method="post" style="margin-top: 25px;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background: #721c24;">Confirmer la suppression</button>
+            <a href="{% url 'frontend-event-detail' event.pk %}" style="margin-left: 15px; color: #666;">Annuler</a>
+        </form>
+    </div>
+{% endblock %}

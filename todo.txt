@@ -10,7 +10,7 @@ Apprendre à collaborer sur un projet en créant des tâches interdépendantes, 
 
 ## Partie 1 : Architecture, Modèles & APIs de Base (60% - Moi)
 
-Ces tâches constituent le coeur du projet. Je m'occupe de toute la structure de données et des premières APIs.
+Ces tâches constituent le coeur du projet. Je m'occupe de toute la structure de données, du frontend de base et des premières APIs.
 
 ### Tâche 1.1 : Initialisation de TOUS les Modèles (`ticketmanager/models.py`) - **TERMINÉ**
 *   **Modèles Événements :**
@@ -27,11 +27,13 @@ Ces tâches constituent le coeur du projet. Je m'occupe de toute la structure de
 ### Tâche 1.3 : Serializers de Base (`ticketmanager/serializers.py`) - **TERMINÉ**
 *   Créer `EventSerializer` et `TicketSerializer`.
 
-### Tâche 1.4 : Vues API de Base (`ticketmanager/views.py`) - **TERMINÉ**
-*   Implémenter le CRUD pour les Événements et les Tickets.
+### Tâche 1.4 : Vues Frontend & API de Base (`ticketmanager/views.py`) - **TERMINÉ**
+*   Implémenter le CRUD Frontend pour les Événements et les Tickets.
+*   Implémenter le CRUD API pour les Événements et les Tickets.
 
-### Tâche 1.5 : Configuration des URLs (`ticketmanager/urls.py`) - **TERMINÉ**
-*   Mise en place des routes `/api/events/` et `/api/tickets/`.
+### Tâche 1.5 : Configuration des URLs & Templates (`ticketmanager/urls.py`) - **TERMINÉ**
+*   Mise en place des routes `/api/` et des routes Frontend.
+*   Création des templates `base.html`, `home.html`, `event_list.html`, `event_detail.html`, `event_add.html`, `ticket_add.html`, `event_confirm_delete.html`.
 
 ---
 
