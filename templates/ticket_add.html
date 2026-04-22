@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter des Tickets - {{ event.name }}{% endblock %}
+
+{% block content %}
+    <h1>Ajouter des tickets pour : {{ event.name }}</h1>
+    <p>Définissez le type de ticket, le prix et la quantité disponible.</p>
+
+    <div class="card" style="margin-top: 20px;">
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: red; font-size: 0.8em;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn">Créer la catégorie de tickets</button>
+                <a href="{% url 'frontend-event-detail' event.pk %}" style="margin-left: 15px; color: #666;">Annuler</a>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+    </style>
+{% endblock %}

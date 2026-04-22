@@ -11,7 +11,8 @@ from .views import (
     event_detail,
     event_add,
     event_edit,
-    event_delete
+    event_delete,
+    ticket_add
 )
 
 urlpatterns = [
@@ -22,6 +23,9 @@ urlpatterns = [
     path('concert/add/', event_add, name='frontend-event-add'),
     path('concert/<int:pk>/edit/', event_edit, name='frontend-event-edit'),
     path('concert/<int:pk>/delete/', event_delete, name='frontend-event-delete'),
+    
+    # Tickets
+    path('concert/<int:event_id>/tickets/add/', ticket_add, name='frontend-ticket-add'),
 
     # --- Vues API (JSON) ---
     path('api/events/', EventListCreateAPIView.as_view(), name='event-list'),

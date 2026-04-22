@@ -21,7 +21,11 @@
         <p>{{ event.description|linebreaks }}</p>
     </div>
 
-    <h2>Tickets Disponibles</h2>
+    <div class="flex-between" style="margin-top: 30px; margin-bottom: 10px;">
+        <h2>Tickets Disponibles</h2>
+        <a href="{% url 'frontend-ticket-add' event.pk %}" class="btn" style="background: #27ae60; font-size: 12px;">+ Ajouter une catégorie</a>
+    </div>
+
     <div class="card">
         {% if tickets %}
             <table>

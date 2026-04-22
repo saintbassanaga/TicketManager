@@ -3,7 +3,7 @@ from django.contrib import messages
 from rest_framework import generics
 from .models import Event, Ticket
 from .serializers import EventSerializer, TicketSerializer
-from .forms import EventForm
+from .forms import EventForm, TicketForm
 
 # ==========================
 # VUES API (DRF)
@@ -30,22 +30,18 @@ class TicketRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 # ==========================
 
 def home(request):
-    """Page d'accueil simple"""
     return render(request, 'home.html')
 
 def event_list(request):
-    """Liste des événements"""
     events = Event.objects.filter(is_active=True).order_by('date')
     return render(request, 'event_list.html', {'events': events})
 
 def event_detail(request, pk):
-    """Détail d'un événement"""
     event = get_object_or_404(Event, pk=pk)
     tickets = event.tickets.filter(is_active=True)
     return render(request, 'event_detail.html', {'event': event, 'tickets': tickets})
 
 def event_add(request):
-    """Ajouter un événement"""
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
@@ -57,7 +53,6 @@ def event_add(request):
     return render(request, 'event_add.html', {'form': form})
 
 def event_edit(request, pk):
-    """Modifier un événement existant"""
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
         form = EventForm(request.POST, instance=event)
@@ -70,10 +65,25 @@ def event_edit(request, pk):
     return render(request, 'event_add.html', {'form': form, 'edit_mode': True})
 
 def event_delete(request, pk):
-    """Supprimer un événement"""
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
         event.delete()
         messages.success(request, "L'événement a été supprimé.")
         return redirect('frontend-event-list')
     return render(request, 'event_confirm_delete.html', {'event': event})
+
+def ticket_add(request, event_id):
+    """Ajouter une catégorie de tickets à un événement spécifique"""
+    event = get_object_or_404(Event, pk=event_id)
+    if request.method == 'POST':
+        form = TicketForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.event = event # On lie le ticket à l'événement
+            ticket.save()
+            messages.success(request, f"La catégorie de tickets a été ajoutée à {event.name}")
+            return redirect('frontend-event-detail', pk=event.pk)
+    else:
+        form = TicketForm()
+    
+    return render(request, 'ticket_add.html', {'form': form, 'event': event})
