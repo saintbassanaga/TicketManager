@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg
+.env
+.venv
+venv/
+env/
+
+# OS-specific files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# IDE-specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Django-specific files
+*.log
+*.pot
+*.mo
+*.sqlite3
+db.sqlite3
+media/ # User-uploaded files, usually handled by cloud storage in production
+static/ # Collected static files, usually served by web server in production
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# My custom files
+my_settings.py # If you use a separate file for local settings
+
+# Editor backup files
+*~
+*.bak
+*.swp
+*.swo
+.DS_Store
