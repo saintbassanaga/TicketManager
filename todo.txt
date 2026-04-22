@@ -1,0 +1,67 @@
+# Projet : Gestionnaire de Tickets de Concert
+
+## Objectif Général
+Développer une application web pour gérer des événements de concert, la vente de tickets, et l'administration des utilisateurs.
+
+## Objectif de Collaboration Git
+Apprendre à collaborer sur un projet en créant des tâches interdépendantes, nécessitant des merges et des résolutions de conflits.
+
+---
+
+## Partie 1 : Architecture, Modèles & APIs de Base (60% - Moi)
+
+Ces tâches constituent le coeur du projet. Je m'occupe de toute la structure de données et des premières APIs.
+
+### Tâche 1.1 : Initialisation de TOUS les Modèles (`ticketmanager/models.py`) - **TERMINÉ**
+*   **Modèles Événements :**
+    *   `Event` : `name`, `description`, `date`, `location`, `is_active`.
+    *   `Ticket` : `event` (FK), `ticket_type`, `price`, `quantity_available`, `is_active`.
+*   **Modèles Commandes :**
+    *   `Order` : `user` (FK), `order_date`, `total_amount`, `is_paid`.
+    *   `OrderItem` : `order` (FK), `ticket` (FK), `quantity`, `price_at_purchase`.
+*   **Action :** Créer les migrations (`makemigrations`) et les appliquer (`migrate`).
+
+### Tâche 1.2 : Enregistrement de TOUS les Modèles dans l'Admin (`ticketmanager/admin.py`) - **TERMINÉ**
+*   Enregistrer `Event`, `Ticket`, `Order`, et `OrderItem` pour une gestion complète via l'interface admin.
+
+### Tâche 1.3 : Serializers de Base (`ticketmanager/serializers.py`)
+*   Créer `EventSerializer` et `TicketSerializer`.
+
+### Tâche 1.4 : Vues API de Base (`ticketmanager/views.py`)
+*   Implémenter le CRUD pour les Événements et les Tickets.
+
+### Tâche 1.5 : Configuration des URLs (`ticketmanager/urls.py`)
+*   Mise en place des routes `/api/events/` et `/api/tickets/`.
+
+---
+
+## Partie 2 : Authentification & Sécurité (20% - Ngah)
+
+Cette partie est nécessaire pour que les utilisateurs puissent passer des commandes.
+
+### Tâche 2.1 : API d'Inscription
+*   Serializer et Vue pour la création de nouveaux comptes utilisateurs.
+*   **Dépendances :** Succès du setup initial de la Partie 1.
+
+### Tâche 2.2 : API de Connexion / JWT ou Token
+*   Mise en place de la récupération de token pour sécuriser les appels futurs.
+
+---
+
+## Partie 3 : Logique métier des Commandes (20% - Dave)
+
+Cette partie utilise les modèles créés dans la Partie 1 et l'auth de la Partie 2.
+
+### Tâche 3.1 : Serializers de Commande
+*   Créer `OrderSerializer` et `OrderItemSerializer`.
+*   **Dépendances :** Modèles créés par "Moi" dans la Tâche 1.1.
+
+### Tâche 3.2 : Vues API de Commande
+*   Créer la logique pour permettre à un utilisateur connecté de créer une commande et de voir son historique.
+*   **Dépendances :** Authentification (Partie 2) et Modèles (Partie 1).
+
+---
+
+## Prochaines Étapes (Frontend & Intégration)
+*   Développement de l'interface React/Vue/Mobile.
+*   Tests unitaires et d'intégration.
