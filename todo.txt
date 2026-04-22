@@ -12,7 +12,7 @@ Apprendre à collaborer sur un projet en créant des tâches interdépendantes, 
 
 Ces tâches constituent le coeur du projet. Je m'occupe de toute la structure de données et des premières APIs.
 
-### Tâche 1.1 : Initialisation de TOUS les Modèles (`ticketmanager/models.py`)
+### Tâche 1.1 : Initialisation de TOUS les Modèles (`ticketmanager/models.py`) - **TERMINÉ**
 *   **Modèles Événements :**
     *   `Event` : `name`, `description`, `date`, `location`, `is_active`.
     *   `Ticket` : `event` (FK), `ticket_type`, `price`, `quantity_available`, `is_active`.
@@ -21,7 +21,7 @@ Ces tâches constituent le coeur du projet. Je m'occupe de toute la structure de
     *   `OrderItem` : `order` (FK), `ticket` (FK), `quantity`, `price_at_purchase`.
 *   **Action :** Créer les migrations (`makemigrations`) et les appliquer (`migrate`).
 
-### Tâche 1.2 : Enregistrement de TOUS les Modèles dans l'Admin (`ticketmanager/admin.py`)
+### Tâche 1.2 : Enregistrement de TOUS les Modèles dans l'Admin (`ticketmanager/admin.py`) - **TERMINÉ**
 *   Enregistrer `Event`, `Ticket`, `Order`, et `OrderItem` pour une gestion complète via l'interface admin.
 
 ### Tâche 1.3 : Serializers de Base (`ticketmanager/serializers.py`)
