@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - TicketManager{% endblock %}
+
+{% block content %}
+    <div class="card" style="text-align: center; padding: 50px;">
+        <h1>Bienvenue sur TicketManager !</h1>
+        <p class="lead" style="font-size: 1.2em; color: #555;">Votre plateforme pour gérer et découvrir les meilleurs concerts.</p>
+        <p style="margin-top: 30px;">
+            <a href="{% url 'frontend-event-list' %}" class="btn" style="padding: 12px 25px; font-size: 1.1em;">Voir tous les événements</a>
+        </p>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center; color: #777;">
+        <p>Gérez vos tickets, créez des événements et bien plus encore.</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Concerts - TicketManager{% endblock %}
+
+{% block content %}
+    <div class="flex-between">
+        <h1>Prochains Concerts</h1>
+        <a href="{% url 'frontend-event-add' %}" class="btn">+ Ajouter un événement</a>
+    </div>
+    <p>Découvrez tous les événements à venir et réservez vos places.</p>
+
+    <div style="margin-top: 30px;">
+        {% for event in events %}
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 style="margin-top: 0;"><a href="{% url 'frontend-event-detail' event.pk %}">{{ event.name }}</a></h2>
+                        <p style="color: #666; margin-bottom: 10px;">
+                            <strong>Date :</strong> {{ event.date|date:"d F Y à H:i" }}<br>
+                            <strong>Lieu :</strong> {{ event.location }}
+                        </p>
+                        <p>{{ event.description|truncatewords:20 }}</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'frontend-event-detail' event.pk %}" class="btn">Voir les tickets</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>Désolé, aucun événement n'est prévu pour le moment.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
