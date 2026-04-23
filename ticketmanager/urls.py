@@ -31,5 +31,7 @@ urlpatterns = [
     path('api/events/', EventListCreateAPIView.as_view(), name='event-list'),
     path('api/events/<int:pk>/', EventRetrieveUpdateDestroyAPIView.as_view(), name='event-detail'),
     path('api/tickets/', TicketListCreateAPIView.as_view(), name='ticket-list'),
-    path('api/tickets/<int:pk>/', TicketRetrieveUpdateDestroyAPIView.as_view(), name='ticket-detail'),
+    path('reserve/<int:ticket_id>/', views.reserve_ticket, name='reserve_ticket'),
+    path('cancel/<int:ticket_id>/', views.cancel_ticket, name='cancel_ticket'),
+    path('api/tickets/<int:pk>/', TicketRetrieveUpdateDestroyAPIView.as_view(), name='ticket-detail')
 ]
