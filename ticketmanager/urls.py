@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework.urlpatterns import format_suffix_patterns
 from .views import (
     # API Views
     EventListCreateAPIView, 
@@ -33,3 +34,4 @@ urlpatterns = [
     path('api/tickets/', TicketListCreateAPIView.as_view(), name='ticket-list'),
     path('api/tickets/<int:pk>/', TicketRetrieveUpdateDestroyAPIView.as_view(), name='ticket-detail'),
 ]
+urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'html'])
