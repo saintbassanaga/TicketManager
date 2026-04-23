@@ -49,3 +49,22 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.ticket.ticket_type} pour {self.order.id}"
+
+#modele de reservation ou d'annulation d'un ticket 
+class Ticket(models.Model):
+    event_name = models.CharField(max_length=200)
+    is_reserved = models.BooleanField(default=False)
+    reserved_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def reserve(self, user):
+        if not self.is_reserved:
+            self.is_reserved = True
+            self.reserved_by = user
+            self.save()
+            return True
+        return False
+
+    def cancel_reservation(self):
+        self.is_reserved = False
+        self.reserved_by = None
+        self.save()

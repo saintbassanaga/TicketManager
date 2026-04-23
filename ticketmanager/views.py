@@ -4,6 +4,7 @@ from rest_framework import generics
 from .models import Event, Ticket
 from .serializers import EventSerializer, TicketSerializer
 from .forms import EventForm, TicketForm
+from django.contrib.auth.decorators import login_required
 
 # ==========================
 # VUES API (DRF)
@@ -87,3 +88,19 @@ def ticket_add(request, event_id):
         form = TicketForm()
     
     return render(request, 'ticket_add.html', {'form': form, 'event': event})
+
+@login_required
+def reserve_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    if ticket.reserve(request.user):
+        # Vous pouvez ajouter un message de succès ici
+        pass
+    return redirect('ticket_detail', pk=ticket.id)
+
+@login_required
+def cancel_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    # Vérifier que c'est bien l'utilisateur qui a réservé qui annule
+    if ticket.reserved_by == request.user:
+        ticket.cancel_reservation()
+    return redirect('ticket_list')

@@ -63,5 +63,16 @@
         {% else %}
             <p>Aucun ticket n'est disponible pour cet événement.</p>
         {% endif %}
+
+        {% if not ticket.is_reserved %}
+                   {% if not ticket.is_reserved %}
+             <a href="{% url 'reserve_ticket' ticket.id %}" class="btn btn-primary">Réserver ce ticket</a>
+       {% elif ticket.reserved_by == user %}
+               <p>Vous avez réservé ce ticket.</p>
+          <a href="{% url 'cancel_ticket' ticket.id %}" class="btn btn-danger">Annuler ma réservation</a>
+      {% else %}
+            <p>Ce ticket est déjà réservé.</p>
+      {% endif %}
     </div>
 {% endblock %}
+
