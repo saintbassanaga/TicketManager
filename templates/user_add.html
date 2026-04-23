@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if edit_mode %}Modifier l'utilisateur{% else %}Ajouter un utilisateur{% endif %} - TicketManager{% endblock %}
+
+{% block content %}
+    <h1>{% if edit_mode %}Modifier l'utilisateur{% else %}Ajouter un utilisateur{% endif %}</h1>
+    <p>{% if edit_mode %}Mettez à jour les informations de l'utilisateur.{% else %}Remplissez le formulaire pour créer un nouvel utilisateur.{% endif %}</p>
+
+    <div class="card" style="margin-top: 20px;">
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: red; font-size: 0.8em;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn">{% if edit_mode %}Mettre à jour l'utilisateur{% else %}Créer l'utilisateur{% endif %}</button>
+                <a href="{% url 'frontend-user-list' %}" style="margin-left: 15px; font-size: 0.9em; color: #666;">Annuler</a>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .input-field:focus {
+            border-color: #2c3e50;
+            outline: none;
+        }
+    </style>
+{% endblock %}

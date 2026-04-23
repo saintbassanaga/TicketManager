@@ -13,6 +13,12 @@ from .views import (
     event_edit,
     event_delete,
     ticket_add
+    ,
+    # User views will be imported below in the list to keep grouping
+)
+from .views import (
+    UserListCreateAPIView,
+    UserRetrieveUpdateDestroyAPIView,
 )
 
 urlpatterns = [
@@ -26,6 +32,10 @@ urlpatterns = [
     
     # Tickets
     path('concert/<int:event_id>/tickets/add/', ticket_add, name='frontend-ticket-add'),
+
+    # Users API (admin-only)
+    path('api/users/', UserListCreateAPIView.as_view(), name='user-list'),
+    path('api/users/<int:pk>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
 
     # --- Vues API (JSON) ---
     path('api/events/', EventListCreateAPIView.as_view(), name='event-list'),

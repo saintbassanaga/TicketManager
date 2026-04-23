@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from rest_framework import generics
+from rest_framework import generics, permissions
 from .models import Event, Ticket
-from .serializers import EventSerializer, TicketSerializer
+from .serializers import EventSerializer, TicketSerializer, UserSerializer, UserCreateSerializer, UserUpdateSerializer
 from .forms import EventForm, TicketForm
+from django.contrib.auth.models import User
+from .forms import UserCreateForm, UserUpdateForm
 
 # ==========================
 # VUES API (DRF)
@@ -23,6 +25,30 @@ class TicketListCreateAPIView(generics.ListCreateAPIView):
 class TicketRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+
+
+# ==========================
+# API: GESTION DES UTILISATEURS
+# ==========================
+
+class UserListCreateAPIView(generics.ListCreateAPIView):
+    queryset = User.objects.all().order_by('username')
+    permission_classes = [permissions.AllowAny]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserCreateSerializer
+        return UserSerializer
+
+
+class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = [permissions.AllowAny]
+
+    def get_serializer_class(self):
+        if self.request.method in ('PUT', 'PATCH'):
+            return UserUpdateSerializer
+        return UserSerializer
 
 
 # ==========================
@@ -87,3 +113,46 @@ def ticket_add(request, event_id):
         form = TicketForm()
     
     return render(request, 'ticket_add.html', {'form': form, 'event': event})
+
+
+# ==========================
+# GESTION DES UTILISATEURS
+# ==========================
+
+def user_list(request):
+    users = User.objects.all().order_by('username')
+    return render(request, 'user_list.html', {'users': users})
+
+
+def user_add(request):
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Utilisateur créé avec succès.")
+            return redirect('frontend-user-list')
+    else:
+        form = UserCreateForm()
+    return render(request, 'user_add.html', {'form': form})
+
+
+def user_edit(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Utilisateur mis à jour avec succès.")
+            return redirect('frontend-user-list')
+    else:
+        form = UserUpdateForm(instance=user)
+    return render(request, 'user_add.html', {'form': form, 'edit_mode': True, 'user_obj': user})
+
+
+def user_delete(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        user.delete()
+        messages.success(request, "Utilisateur supprimé.")
+        return redirect('frontend-user-list')
+    return render(request, 'user_confirm_delete.html', {'user': user})
