@@ -49,3 +49,4 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.ticket.ticket_type} pour {self.order.id}"
+
