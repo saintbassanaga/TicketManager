@@ -6,6 +6,7 @@
     <div class="flex-between" style="margin-bottom: 20px;">
         <a href="{% url 'frontend-event-list' %}" style="font-size: 0.9em;">&larr; Retour à la liste</a>
         <div>
+            <a href="{% url 'event-detail' event.pk %}?format=json" class="btn" style="background: #7f8c8d; margin-right: 5px;">Voir JSON</a>
             <a href="{% url 'frontend-event-edit' event.pk %}" class="btn" style="background: #f39c12; margin-right: 5px;">Modifier</a>
             <a href="{% url 'frontend-event-delete' event.pk %}" class="btn" style="background: #e74c3c;">Supprimer</a>
         </div>
