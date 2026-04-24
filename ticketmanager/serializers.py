@@ -1,14 +1,15 @@
 from rest_framework import serializers
-from .models import Event, Ticket
 from django.contrib.auth.models import User
+from .models import Event, Ticket, Order, OrderItem
+
 
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'event', 'ticket_type', 'price', 'quantity_available', 'is_active']
 
+
 class EventSerializer(serializers.ModelSerializer):
-    # Permet de voir les tickets associés lors de la consultation d'un événement
     tickets = TicketSerializer(many=True, read_only=True)
 
     class Meta:
@@ -52,3 +53,26 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    price_at_purchase = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'ticket', 'quantity', 'price_at_purchase']
+
+    def create(self, validated_data):
+        # Auto-fill price from the ticket at the moment of purchase
+        validated_data['price_at_purchase'] = validated_data['ticket'].price
+        return super().create(validated_data)
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+    user = serializers.StringRelatedField(read_only=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'order_date', 'total_amount', 'is_paid', 'items']
