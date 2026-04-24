@@ -1,0 +1,9 @@
+{% for field in form %}
+    <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+            <div style="color: red; font-size: 0.8em;">{{ field.errors }}</div>
+        {% endif %}
+    </div>
+{% endfor %}

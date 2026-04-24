@@ -9,27 +9,79 @@
         header {
             background: #2c3e50;
             color: white;
-            padding: 15px 20px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: stretch;
+            height: 52px;
         }
 
         header .logo {
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
         }
 
-        header nav a {
+        header .logo a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
-            font-size: 0.9em;
+            letter-spacing: 0.03em;
+        }
+
+        header nav {
+            display: flex;
+            align-items: stretch;
+        }
+
+        header nav a,
+        header nav .nav-user {
+            color: white;
+            text-decoration: none;
+            font-size: 0.88em;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            border-bottom: 3px solid transparent;
+            transition: background 0.15s, border-color 0.15s;
         }
 
         header nav a:hover {
-            text-decoration: underline;
+            background: rgba(255,255,255,0.08);
+            text-decoration: none;
+            border-bottom-color: rgba(255,255,255,0.4);
         }
+
+        header nav .nav-divider {
+            width: 1px;
+            background: rgba(255,255,255,0.15);
+            margin: 10px 4px;
+        }
+
+        header nav .nav-user {
+            gap: 10px;
+            padding: 0 14px;
+            font-size: 0.88em;
+        }
+
+        header nav .nav-user span {
+            opacity: 0.75;
+            font-style: italic;
+        }
+
+        header nav .nav-logout {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.88em;
+            padding: 0;
+            text-decoration: underline;
+            opacity: 0.85;
+        }
+
+        header nav .nav-logout:hover { opacity: 1; }
 
         .container { padding: 30px 20px; max-width: 900px; margin: auto; }
 
@@ -68,18 +120,51 @@
         a:hover { text-decoration: underline; }
 
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .input-field:focus {
+            border-color: #2c3e50;
+            outline: none;
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo">
-        <a href="{% url 'frontend-home' %}" style="color: white; text-decoration: none;">TicketManager</a>
+        <a href="{% url 'frontend-home' %}">TicketManager</a>
     </div>
+
+    <!-- Left nav: main sections -->
     <nav>
         <a href="{% url 'frontend-home' %}">Accueil</a>
         <a href="{% url 'frontend-event-list' %}">Événements</a>
+        <a href="{% url 'frontend-user-list' %}">Utilisateurs</a>
+    </nav>
+
+    <!-- Right nav: tools + user -->
+    <nav style="margin-left: auto;">
+        <a href="{% url 'event-list' %}">API</a>
         <a href="/admin/">Admin</a>
+        <div class="nav-divider"></div>
+        {% if user.is_authenticated %}
+            <div class="nav-user">
+                <span>{{ user.username }}</span>
+                <form method="post" action="{% url 'frontend-logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-logout">Déconnexion</button>
+                </form>
+            </div>
+        {% else %}
+            <a href="{% url 'frontend-login' %}">Connexion</a>
+        {% endif %}
     </nav>
 </header>
 

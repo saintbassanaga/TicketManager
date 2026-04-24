@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if edit_mode %}Modifier l'utilisateur{% else %}Ajouter un utilisateur{% endif %} - TicketManager{% endblock %}
+
+{% block content %}
+    <h1>{% if edit_mode %}Modifier l'utilisateur{% else %}Ajouter un utilisateur{% endif %}</h1>
+    <p>{% if edit_mode %}Mettez à jour les informations de l'utilisateur.{% else %}Remplissez le formulaire pour créer un nouvel utilisateur.{% endif %}</p>
+
+    <div class="card" style="margin-top: 20px;">
+        <form method="post">
+            {% csrf_token %}
+            {% include '_form_fields.html' %}
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn">{% if edit_mode %}Mettre à jour l'utilisateur{% else %}Créer l'utilisateur{% endif %}</button>
+                <a href="{% url 'frontend-user-list' %}" style="margin-left: 15px; font-size: 0.9em; color: #666;">Annuler</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
