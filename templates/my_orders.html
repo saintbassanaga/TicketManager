@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes réservations - TicketManager{% endblock %}
+
+{% block content %}
+    <div class="flex-between">
+        <h1>Mes réservations</h1>
+        <a href="{% url 'frontend-event-list' %}" class="btn">Voir les événements</a>
+    </div>
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="card" style="margin-top: 20px;">
+                <div class="flex-between" style="margin-bottom: 10px;">
+                    <div>
+                        <strong>Commande #{{ order.id }}</strong>
+                        <span style="color: #888; font-size: 0.88em; margin-left: 10px;">{{ order.order_date|date:"d F Y à H:i" }}</span>
+                    </div>
+                    <div>
+                        {% if order.is_paid %}
+                            <span style="color: #27ae60; font-weight: bold;">Payée</span>
+                        {% else %}
+                            <span style="color: #e67e22; font-weight: bold;">En attente de paiement</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Événement</th>
+                            <th>Catégorie</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Sous-total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.ticket.event.name }}</td>
+                                <td>{{ item.ticket.get_ticket_type_display }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.price_at_purchase }} FCFA</td>
+                                <td><strong>{{ item.price_at_purchase|floatformat:0 }} × {{ item.quantity }} = {{ item.quantity|stringformat:"s" }}</strong>
+                                    {% widthratio item.price_at_purchase 1 item.quantity %} FCFA</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="text-align: right;"><strong>Total</strong></td>
+                            <td><strong>{{ order.total_amount }} FCFA</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="card" style="text-align: center; padding: 40px; margin-top: 20px;">
+            <p style="color: #888;">Vous n'avez pas encore de réservation.</p>
+            <a href="{% url 'frontend-event-list' %}" class="btn" style="margin-top: 10px;">Voir les concerts</a>
+        </div>
+    {% endif %}
+{% endblock %}

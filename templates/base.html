@@ -142,21 +142,28 @@
         <a href="{% url 'frontend-home' %}">TicketManager</a>
     </div>
 
-    <!-- Left nav: main sections -->
+    <!-- Left nav: sections visibles selon le rôle -->
     <nav>
         <a href="{% url 'frontend-home' %}">Accueil</a>
         <a href="{% url 'frontend-event-list' %}">Événements</a>
-        <a href="{% url 'frontend-user-list' %}">Utilisateurs</a>
+        {% if user.is_authenticated and not user.is_staff %}
+            <a href="{% url 'my-orders' %}">Mes réservations</a>
+        {% endif %}
+        {% if user.is_staff %}
+            <a href="{% url 'frontend-user-list' %}">Utilisateurs</a>
+        {% endif %}
     </nav>
 
-    <!-- Right nav: tools + user -->
+    <!-- Right nav: outils admin + session utilisateur -->
     <nav style="margin-left: auto;">
-        <a href="{% url 'event-list' %}">API</a>
-        <a href="/admin/">Admin</a>
+        {% if user.is_staff %}
+            <a href="{% url 'event-list' %}">API</a>
+            <a href="/admin/">Admin Django</a>
+        {% endif %}
         <div class="nav-divider"></div>
         {% if user.is_authenticated %}
             <div class="nav-user">
-                <span>{{ user.username }}</span>
+                <span>{{ user.username }}{% if user.is_staff %} (admin){% endif %}</span>
                 <form method="post" action="{% url 'frontend-logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="nav-logout">Déconnexion</button>
@@ -164,6 +171,7 @@
             </div>
         {% else %}
             <a href="{% url 'frontend-login' %}">Connexion</a>
+            <a href="{% url 'frontend-register' %}">Inscription</a>
         {% endif %}
     </nav>
 </header>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Réserver - {{ ticket.event.name }}{% endblock %}
+
+{% block content %}
+    <a href="{% url 'frontend-event-detail' ticket.event.pk %}" style="font-size: 0.9em;">&larr; Retour à l'événement</a>
+
+    <div class="card" style="max-width: 480px; margin: 30px auto;">
+        <h1 style="margin-top: 0;">Réserver un ticket</h1>
+
+        <div style="background: #f8f9fa; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
+            <p style="margin: 0 0 6px;"><strong>Événement :</strong> {{ ticket.event.name }}</p>
+            <p style="margin: 0 0 6px;"><strong>Catégorie :</strong> {{ ticket.get_ticket_type_display }}</p>
+            <p style="margin: 0 0 6px;"><strong>Prix unitaire :</strong> {{ ticket.price }} FCFA</p>
+            <p style="margin: 0;"><strong>Places restantes :</strong> {{ ticket.quantity_available }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: bold;">Nombre de places</label>
+                <input type="number" name="quantity" value="1" min="1" max="{{ ticket.quantity_available }}"
+                       class="input-field" style="width: 120px;" required>
+            </div>
+            <div id="total-preview" style="margin-bottom: 20px; color: #555; font-size: 0.95em;"></div>
+            <button type="submit" class="btn" style="background: #27ae60; padding: 10px 24px;">Confirmer la réservation</button>
+            <a href="{% url 'frontend-event-detail' ticket.event.pk %}" style="margin-left: 15px; color: #666; font-size: 0.9em;">Annuler</a>
+        </form>
+    </div>
+
+    <script>
+        const price = {{ ticket.price }};
+        const input = document.querySelector('input[name="quantity"]');
+        const preview = document.getElementById('total-preview');
+        function updateTotal() {
+            const qty = parseInt(input.value) || 0;
+            preview.textContent = qty > 0 ? 'Total : ' + (price * qty).toLocaleString() + ' FCFA' : '';
+        }
+        input.addEventListener('input', updateTotal);
+        updateTotal();
+    </script>
+{% endblock %}

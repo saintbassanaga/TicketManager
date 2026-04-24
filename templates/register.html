@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription - TicketManager{% endblock %}
+
+{% block content %}
+    <div class="card" style="max-width: 480px; margin: 60px auto;">
+        <h1 style="margin-top: 0;">Créer un compte</h1>
+        <p style="color: #666;">Remplissez le formulaire pour vous inscrire. Vous pourrez ensuite consulter et réserver des tickets.</p>
+
+        <form method="post" style="margin-top: 20px;">
+            {% csrf_token %}
+            {% include '_form_fields.html' %}
+            <button type="submit" class="btn" style="width: 100%; padding: 10px; margin-top: 10px;">S'inscrire</button>
+        </form>
+
+        <p style="margin-top: 20px; text-align: center; color: #666; font-size: 0.9em;">
+            Déjà un compte ? <a href="{% url 'frontend-login' %}">Se connecter</a>
+        </p>
+    </div>
+{% endblock %}

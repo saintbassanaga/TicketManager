@@ -13,6 +13,7 @@ from .views import (
     UserListCreateAPIView,
     UserRetrieveUpdateDestroyAPIView,
     LoginAPIView,
+    RegisterAPIView,
     # Frontend Views
     home,
     event_list,
@@ -27,35 +28,35 @@ from .views import (
     user_delete,
     login_view,
     logout_view,
+    register_view,
+    reserve_ticket,
+    my_orders,
 )
 
-urlpatterns = [
-    # --- Authentification ---
+# Frontend HTML routes — no format suffixes
+frontend_urlpatterns = [
     path('login/', login_view, name='frontend-login'),
     path('logout/', logout_view, name='frontend-logout'),
-
-    # --- Vues Frontend (HTML) ---
+    path('register/', register_view, name='frontend-register'),
     path('', home, name='frontend-home'),
     path('events/', event_list, name='frontend-event-list'),
     path('concert/<int:pk>/', event_detail, name='frontend-event-detail'),
     path('concert/add/', event_add, name='frontend-event-add'),
     path('concert/<int:pk>/edit/', event_edit, name='frontend-event-edit'),
     path('concert/<int:pk>/delete/', event_delete, name='frontend-event-delete'),
-    
-    # Tickets
     path('concert/<int:event_id>/tickets/add/', ticket_add, name='frontend-ticket-add'),
-
-    # Users Frontend
+    path('tickets/<int:ticket_id>/reserve/', reserve_ticket, name='reserve-ticket'),
+    path('my-orders/', my_orders, name='my-orders'),
     path('users/', user_list, name='frontend-user-list'),
     path('users/add/', user_add, name='frontend-user-add'),
     path('users/<int:pk>/edit/', user_edit, name='frontend-user-edit'),
     path('users/<int:pk>/delete/', user_delete, name='frontend-user-delete'),
+]
 
-    # Users API
-    path('api/users/', UserListCreateAPIView.as_view(), name='user-list'),
-    path('api/users/<int:pk>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
-
-    # --- Vues API (JSON) ---
+# API routes — format suffixes apply (?format=json or .json)
+api_urlpatterns = format_suffix_patterns([
+    path('api/login/', LoginAPIView.as_view(), name='api-login'),
+    path('api/register/', RegisterAPIView.as_view(), name='api-register'),
     path('api/events/', EventListCreateAPIView.as_view(), name='event-list'),
     path('api/events/<int:pk>/', EventRetrieveUpdateDestroyAPIView.as_view(), name='event-detail'),
     path('api/tickets/', TicketListCreateAPIView.as_view(), name='ticket-list'),
@@ -64,6 +65,8 @@ urlpatterns = [
     path('api/orders/<int:pk>/', OrderRetrieveUpdateDestroyAPIView.as_view(), name='order-detail'),
     path('api/order-items/', OrderItemListCreateAPIView.as_view(), name='orderitem-list'),
     path('api/order-items/<int:pk>/', OrderItemRetrieveUpdateDestroyAPIView.as_view(), name='orderitem-detail'),
-    path('api/login/', LoginAPIView.as_view(), name='api_login'),
-]
-urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'html'])
+    path('api/users/', UserListCreateAPIView.as_view(), name='user-list'),
+    path('api/users/<int:pk>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
+], allowed=['json', 'html'])
+
+urlpatterns = frontend_urlpatterns + api_urlpatterns
