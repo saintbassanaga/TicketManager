@@ -5,11 +5,13 @@
 {% block content %}
     <div class="flex-between" style="margin-bottom: 20px;">
         <a href="{% url 'frontend-event-list' %}" style="font-size: 0.9em;">&larr; Retour à la liste</a>
+        {% if user.is_staff %}
         <div>
             <a href="{% url 'event-detail' event.pk %}?format=json" class="btn" style="background: #7f8c8d; margin-right: 5px;">Voir JSON</a>
             <a href="{% url 'frontend-event-edit' event.pk %}" class="btn" style="background: #f39c12; margin-right: 5px;">Modifier</a>
             <a href="{% url 'frontend-event-delete' event.pk %}" class="btn" style="background: #e74c3c;">Supprimer</a>
         </div>
+        {% endif %}
     </div>
 
     <div class="card">
@@ -24,7 +26,9 @@
 
     <div class="flex-between" style="margin-top: 30px; margin-bottom: 10px;">
         <h2>Tickets Disponibles</h2>
-        <a href="{% url 'frontend-ticket-add' event.pk %}" class="btn" style="background: #27ae60; font-size: 12px;">+ Ajouter une catégorie</a>
+        {% if user.is_staff %}
+            <a href="{% url 'frontend-ticket-add' event.pk %}" class="btn" style="background: #27ae60; font-size: 12px;">+ Ajouter une catégorie</a>
+        {% endif %}
     </div>
 
     <div class="card">
@@ -52,7 +56,7 @@
                             </td>
                             <td>
                                 {% if ticket.quantity_available > 0 %}
-                                    <a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">Réserver</a>
+                                    <a href="{% url 'reserve-ticket' ticket.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px; background: #27ae60;">Réserver</a>
                                 {% else %}
                                     <button class="btn" disabled style="padding: 5px 10px; font-size: 12px; background: #ccc; cursor: not-allowed;">Indisponible</button>
                                 {% endif %}

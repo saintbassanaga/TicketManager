@@ -28,6 +28,8 @@ from .views import (
     login_view,
     logout_view,
     register_view,
+    reserve_ticket,
+    my_orders,
 )
 
 # Frontend HTML routes — no format suffixes
@@ -42,6 +44,8 @@ frontend_urlpatterns = [
     path('concert/<int:pk>/edit/', event_edit, name='frontend-event-edit'),
     path('concert/<int:pk>/delete/', event_delete, name='frontend-event-delete'),
     path('concert/<int:event_id>/tickets/add/', ticket_add, name='frontend-ticket-add'),
+    path('tickets/<int:ticket_id>/reserve/', reserve_ticket, name='reserve-ticket'),
+    path('my-orders/', my_orders, name='my-orders'),
     path('users/', user_list, name='frontend-user-list'),
     path('users/add/', user_add, name='frontend-user-add'),
     path('users/<int:pk>/edit/', user_edit, name='frontend-user-edit'),

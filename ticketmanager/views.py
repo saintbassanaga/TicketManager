@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -311,3 +312,58 @@ def user_delete(request, pk):
         messages.success(request, "Utilisateur supprimé.")
         return redirect('frontend-user-list')
     return render(request, 'user_confirm_delete.html', {'user': user})
+
+
+# ==========================
+# RÉSERVATION — utilisateur connecté
+# ==========================
+
+@login_required
+def reserve_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, pk=ticket_id, is_active=True)
+
+    if ticket.quantity_available == 0:
+        messages.error(request, "Ce ticket est complet.")
+        return redirect('frontend-event-detail', pk=ticket.event.pk)
+
+    if request.method == 'POST':
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+        except (ValueError, TypeError):
+            quantity = 0
+
+        if quantity < 1:
+            messages.error(request, "La quantité doit être au moins 1.")
+        elif quantity > ticket.quantity_available:
+            messages.error(request, f"Seulement {ticket.quantity_available} place(s) disponible(s).")
+        else:
+            with transaction.atomic():
+                t = Ticket.objects.select_for_update().get(pk=ticket_id)
+                if quantity > t.quantity_available:
+                    messages.error(request, "Plus assez de places disponibles, veuillez réessayer.")
+                else:
+                    order = Order.objects.create(
+                        user=request.user,
+                        total_amount=t.price * quantity,
+                    )
+                    OrderItem.objects.create(
+                        order=order,
+                        ticket=t,
+                        quantity=quantity,
+                        price_at_purchase=t.price,
+                    )
+                    t.quantity_available -= quantity
+                    t.save()
+                    messages.success(request, f"Réservation confirmée ! {quantity} ticket(s) pour {t.event.name}.")
+                    return redirect('my-orders')
+
+    return render(request, 'reserve_ticket.html', {'ticket': ticket})
+
+
+@login_required
+def my_orders(request):
+    orders = (Order.objects
+              .filter(user=request.user)
+              .order_by('-order_date')
+              .prefetch_related('items__ticket__event'))
+    return render(request, 'my_orders.html', {'orders': orders})
