@@ -13,6 +13,7 @@ from .views import (
     UserListCreateAPIView,
     UserRetrieveUpdateDestroyAPIView,
     LoginAPIView,
+    RegisterAPIView,
     # Frontend Views
     home,
     event_list,
@@ -54,7 +55,8 @@ frontend_urlpatterns = [
 
 # API routes — format suffixes apply (?format=json or .json)
 api_urlpatterns = format_suffix_patterns([
-    path('api/login/', LoginAPIView.as_view(), name='api_login'),
+    path('api/login/', LoginAPIView.as_view(), name='api-login'),
+    path('api/register/', RegisterAPIView.as_view(), name='api-register'),
     path('api/events/', EventListCreateAPIView.as_view(), name='event-list'),
     path('api/events/<int:pk>/', EventRetrieveUpdateDestroyAPIView.as_view(), name='event-detail'),
     path('api/tickets/', TicketListCreateAPIView.as_view(), name='ticket-list'),

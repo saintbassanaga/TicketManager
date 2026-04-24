@@ -5,7 +5,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
-from rest_framework import generics, permissions, status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import generics, permissions, status, serializers as drf_serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -14,6 +15,7 @@ from .serializers import (
     EventSerializer, TicketSerializer,
     UserSerializer, UserCreateSerializer, UserUpdateSerializer,
     OrderSerializer, OrderItemSerializer,
+    LoginSerializer, RegisterSerializer,
 )
 from .forms import EventForm, TicketForm, UserCreateForm, UserUpdateForm, RegisterForm
 
@@ -131,12 +133,30 @@ class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 # ==========================
-# API LOGIN (publique)
+# API LOGIN / REGISTER (publique)
 # ==========================
+
+_auth_response_serializer = inline_serializer(
+    name='AuthTokenResponse',
+    fields={
+        'token': drf_serializers.CharField(),
+        'username': drf_serializers.CharField(),
+        'is_staff': drf_serializers.BooleanField(),
+    },
+)
+
 
 class LoginAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=LoginSerializer,
+        responses={200: _auth_response_serializer, 401: inline_serializer(
+            name='LoginError', fields={'error': drf_serializers.CharField()}
+        )},
+        summary='Obtain auth token',
+        tags=['Auth'],
+    )
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -149,6 +169,28 @@ class LoginAPIView(APIView):
                 'is_staff': user.is_staff,
             }, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class RegisterAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={201: _auth_response_serializer, 400: RegisterSerializer},
+        summary='Create a new account',
+        tags=['Auth'],
+    )
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                'token': token.key,
+                'username': user.username,
+                'is_staff': user.is_staff,
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ==========================
