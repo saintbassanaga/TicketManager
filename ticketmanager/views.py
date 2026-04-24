@@ -1,3 +1,4 @@
+from functools import wraps
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -13,7 +14,32 @@ from .serializers import (
     UserSerializer, UserCreateSerializer, UserUpdateSerializer,
     OrderSerializer, OrderItemSerializer,
 )
-from .forms import EventForm, TicketForm, UserCreateForm, UserUpdateForm
+from .forms import EventForm, TicketForm, UserCreateForm, UserUpdateForm, RegisterForm
+
+
+# ==========================
+# PERMISSIONS & DECORATEURS
+# ==========================
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """Lecture pour tout utilisateur authentifié, écriture réservée aux admins."""
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return request.user.is_authenticated
+        return request.user.is_authenticated and request.user.is_staff
+
+
+def admin_required(view_func):
+    """Redirige vers l'accueil avec un message d'erreur si l'utilisateur n'est pas admin."""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(f'/login/?next={request.path}')
+        if not request.user.is_staff:
+            messages.error(request, "Accès réservé aux administrateurs.")
+            return redirect('frontend-home')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
 # ==========================
@@ -23,28 +49,31 @@ from .forms import EventForm, TicketForm, UserCreateForm, UserUpdateForm
 class EventListCreateAPIView(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class EventRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class TicketListCreateAPIView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class TicketRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class OrderListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
-        # Staff see all orders; regular users see only their own
         if self.request.user.is_staff:
             return Order.objects.all().order_by('-order_date')
         return Order.objects.filter(user=self.request.user).order_by('-order_date')
@@ -82,6 +111,7 @@ class OrderItemRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVie
 
 class UserListCreateAPIView(generics.ListCreateAPIView):
     queryset = User.objects.all().order_by('username')
+    permission_classes = [permissions.IsAdminUser]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -91,6 +121,7 @@ class UserListCreateAPIView(generics.ListCreateAPIView):
 
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
+    permission_classes = [permissions.IsAdminUser]
 
     def get_serializer_class(self):
         if self.request.method in ('PUT', 'PATCH'):
@@ -99,7 +130,7 @@ class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 # ==========================
-# VUES API DE CONNEXION (publique)
+# API LOGIN (publique)
 # ==========================
 
 class LoginAPIView(APIView):
@@ -111,12 +142,16 @@ class LoginAPIView(APIView):
         user = authenticate(username=username, password=password)
         if user is not None:
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key, 'username': user.username}, status=status.HTTP_200_OK)
+            return Response({
+                'token': token.key,
+                'username': user.username,
+                'is_staff': user.is_staff,
+            }, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # ==========================
-# AUTHENTIFICATION FRONTEND (publique)
+# AUTHENTIFICATION (publique)
 # ==========================
 
 def login_view(request):
@@ -141,8 +176,23 @@ def logout_view(request):
     return redirect('frontend-login')
 
 
+def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('frontend-home')
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f"Bienvenue {user.username} ! Votre compte a été créé.")
+            return redirect('frontend-home')
+    else:
+        form = RegisterForm()
+    return render(request, 'register.html', {'form': form})
+
+
 # ==========================
-# VUES TEMPLATES (FRONTEND) — connexion requise
+# FRONTEND — utilisateur connecté
 # ==========================
 
 @login_required
@@ -163,7 +213,11 @@ def event_detail(request, pk):
     return render(request, 'event_detail.html', {'event': event, 'tickets': tickets})
 
 
-@login_required
+# ==========================
+# FRONTEND — admin uniquement
+# ==========================
+
+@admin_required
 def event_add(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
@@ -176,7 +230,7 @@ def event_add(request):
     return render(request, 'event_add.html', {'form': form})
 
 
-@login_required
+@admin_required
 def event_edit(request, pk):
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
@@ -190,7 +244,7 @@ def event_edit(request, pk):
     return render(request, 'event_add.html', {'form': form, 'edit_mode': True})
 
 
-@login_required
+@admin_required
 def event_delete(request, pk):
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
@@ -200,7 +254,7 @@ def event_delete(request, pk):
     return render(request, 'event_confirm_delete.html', {'event': event})
 
 
-@login_required
+@admin_required
 def ticket_add(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     if request.method == 'POST':
@@ -216,13 +270,13 @@ def ticket_add(request, event_id):
     return render(request, 'ticket_add.html', {'form': form, 'event': event})
 
 
-@login_required
+@admin_required
 def user_list(request):
     users = User.objects.all().order_by('username')
     return render(request, 'user_list.html', {'users': users})
 
 
-@login_required
+@admin_required
 def user_add(request):
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
@@ -235,7 +289,7 @@ def user_add(request):
     return render(request, 'user_add.html', {'form': form})
 
 
-@login_required
+@admin_required
 def user_edit(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method == 'POST':
@@ -249,7 +303,7 @@ def user_edit(request, pk):
     return render(request, 'user_add.html', {'form': form, 'edit_mode': True, 'user_obj': user})
 
 
-@login_required
+@admin_required
 def user_delete(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method == 'POST':

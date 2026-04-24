@@ -26,10 +26,26 @@ class TicketForm(forms.ModelForm):
         }
 
 
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'input-field'}))
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.is_staff = False
+        if commit:
+            user.save()
+        return user
+
+
 class UserCreateForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name')
+        fields = ('username', 'email', 'first_name', 'last_name', 'is_staff')
 
 
 class UserUpdateForm(forms.ModelForm):
